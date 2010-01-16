@@ -104,5 +104,5 @@ require 'mongo_mapper/support'
 require 'mongo_mapper/finder_options'
 require 'mongo_mapper/plugins'
 
-require 'mongo_mapper/document'
 require 'mongo_mapper/embedded_document'
+require 'mongo_mapper/document'

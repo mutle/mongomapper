@@ -3,60 +3,59 @@ module MongoMapper
     module Callbacks
       def self.configure(model)
         model.class_eval do
-          include ActiveSupport::Callbacks
-
-          define_callbacks(
-            :before_save, :after_save, 
-            :before_create, :after_create, 
-            :before_update, :after_update, 
-            :before_validation, :after_validation, 
-            :before_validation_on_create, :after_validation_on_create, 
-            :before_validation_on_update, :after_validation_on_update, 
-            :before_destroy, :after_destroy
-          )
+          CALLBACKS = [ :save, :create, :update, :validation, :validation_on_create, :validation_on_update, :destroy ]
+          extend ActiveModel::Callbacks
+          define_model_callbacks *CALLBACKS
         end
       end
       
       module InstanceMethods
         def valid?
           action = new? ? 'create' : 'update'
+          result = nil
 
-          run_callbacks(:before_validation)
-          run_callbacks("before_validation_on_#{action}".to_sym)
-          result = super
-          run_callbacks("after_validation_on_#{action}".to_sym)
-          run_callbacks(:after_validation)
+          run_callbacks(:validation) do
+            run_callbacks("validation_on_#{action}".to_sym) do
+              result = super
+            end
+          end
 
           result
         end
 
         def destroy
-          run_callbacks(:before_destroy)
-          result = super
-          run_callbacks(:after_destroy)
+          result = nil
+          run_callbacks(:destroy) do
+            result = super
+          end
           result
         end
 
         private
           def create_or_update(*args)
-            run_callbacks(:before_save)
-            if result = super
-              run_callbacks(:after_save)
+            result = nil
+            run_callbacks(:save) do
+              # if result = super
+              #   run_callbacks(:_save)
+              # end
+              result = super
             end
             result
           end
 
           def create(*args)
-            run_callbacks(:before_create)
-            result = super
-            run_callbacks(:after_create)
+            result = nil
+            run_callbacks(:create) do
+              result = super
+            end
             result
           end
 
           def update(*args)
-            run_callbacks(:before_update)
-            result = super
-            run_callbacks(:after_update)
+            result = nil
+            run_callbacks(:update) do
+              result = super
+            end
             result
           end
       end
