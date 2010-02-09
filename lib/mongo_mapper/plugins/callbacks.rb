@@ -1,9 +1,9 @@
 module MongoMapper
   module Plugins
     module Callbacks
+      CALLBACKS = [ :save, :create, :update, :validation, :validation_on_create, :validation_on_update, :destroy ]
       def self.configure(model)
         model.class_eval do
-          CALLBACKS = [ :save, :create, :update, :validation, :validation_on_create, :validation_on_update, :destroy ]
           extend ActiveModel::Callbacks
           define_model_callbacks *CALLBACKS
         end
